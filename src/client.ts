@@ -1,10 +1,13 @@
 import config from './lib/config'
 import { SpecEventClientOptions, EventCallback } from './lib/types'
 import { create as createSocket, AGClientSocket } from 'socketcluster-client'
+import logger from './lib/logger'
 
 const DEFAULT_OPTIONS = {
     hostname: config.HOSTNAME,
     port: config.PORT,
+    oneSubPerChannel: true,
+    onConnect: () => {},
 }
 
 /**
@@ -15,8 +18,12 @@ const DEFAULT_OPTIONS = {
 export default class SpecEventClient {
     socket: AGClientSocket
 
+    channelSubs: Set<string>
+
     protected hostname: string
     protected port: number
+    protected oneSubPerChannel: boolean
+    protected onConnect: () => void
 
     /**
      * Create a new Spec client instance.
@@ -25,21 +32,43 @@ export default class SpecEventClient {
         const settings = { ...DEFAULT_OPTIONS, ...options }
         this.hostname = settings.hostname
         this.port = settings.port
+        this.oneSubPerChannel = settings.oneSubPerChannel
+        this.onConnect = settings.onConnect
+        this.channelSubs = new Set<string>()
         this.socket = this._initSocket()
     }
 
-    on(event: string, cb: EventCallback) {
+    on(channelName: string, cb: EventCallback) {
+        if (this.oneSubPerChannel && this.channelSubs.has(channelName)) {
+            logger.warn(`Already subscribed to channel ${channelName}.`)
+            return
+        }
+        
         ;(async () => {
-            for await (const data of this.socket.subscribe(event)) {
+            const channel = this.socket.subscribe(channelName)
+            logger.info(`Subscribed to channel ${channelName}.`)
+
+            for await (const data of channel) {
                 cb(data)
             }
         })()
+
+        this.channelSubs.add(channelName)
     }
 
     _initSocket(): AGClientSocket {
-        return createSocket({
+        const socket = createSocket({
             hostname: this.hostname,
             port: this.port,
         })
+
+        ;(async () => {
+            for await (let event of socket.listener('connect')) {
+                logger.info('Socket connected.')
+                this.onConnect()
+            }
+        })()
+
+        return socket
     }
 }

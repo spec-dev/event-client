@@ -1,10 +1,11 @@
 import SpecEventClient from './client'
+import { SpecEventClientOptions } from './lib/types'
 
 /**
  * Creates a new Spec Event Client.
  */
-const createEventClient = (): SpecEventClient => {
-    return new SpecEventClient()
+const createEventClient = (options?: SpecEventClientOptions): SpecEventClient => {
+    return new SpecEventClient(options)
 }
 
-export { createEventClient, SpecEventClient }
+export { createEventClient, SpecEventClient, SpecEventClientOptions }
