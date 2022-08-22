@@ -8,4 +8,5 @@ const createEventClient = (options?: SpecEventClientOptions): SpecEventClient =>
     return new SpecEventClient(options)
 }
 
-export { createEventClient, SpecEventClient, SpecEventClientOptions }
+export { createEventClient, SpecEventClient }
+export * from './lib/types'
