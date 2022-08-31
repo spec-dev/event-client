@@ -22,8 +22,8 @@ export default class SpecEventClient {
 
     channelSubs: Set<string>
 
-    protected hostname: string
-    protected port: number
+    options: SpecEventClientOptions
+
     protected oneSubPerChannel: boolean
     protected signedAuthToken: string | null
     protected onConnect: () => void
@@ -32,13 +32,23 @@ export default class SpecEventClient {
      * Create a new client instance.
      */
     constructor(options?: SpecEventClientOptions) {
-        const settings = { ...DEFAULT_OPTIONS, ...options }
-        this.hostname = settings.hostname
-        this.port = settings.port
+        const settings = { ...DEFAULT_OPTIONS, ...(options || {}) }
+        if (settings.port === 443 && !settings.hasOwnProperty('secure')) {
+            settings.secure = true
+        } else if (settings.secure === true && !settings.port) {
+            settings.port = 443
+        }
+
+        this.options = settings
         this.oneSubPerChannel = settings.oneSubPerChannel
         this.signedAuthToken = settings.signedAuthToken
         this.onConnect = settings.onConnect
         this.channelSubs = new Set<string>()
+
+        if (this.signedAuthToken) {
+            this.options.authEngine = this._serverSideAuthEngine()
+        }
+
         this.socket = this._initSocket()
     }
 
@@ -66,21 +76,12 @@ export default class SpecEventClient {
     }
 
     _initSocket(): AGClientSocket {
-        const options: AGClientSocket.ClientOptions = {
-            hostname: this.hostname,
-            port: this.port,
-        }
-
-        if (this.signedAuthToken) {
-            options.authEngine = this._serverSideAuthEngine()
-        }
-
-        const socket = createSocket(options)
+        const socket = createSocket(this.options)
 
         ;(async () => {
-            for await (let event of socket.listener('connect')) {
+            for await (let _ of socket.listener('connect')) {
                 logger.info('Socket connected.')
-                this.onConnect()
+                this.onConnect && this.onConnect()
             }
         })()
 

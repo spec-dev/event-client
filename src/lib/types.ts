@@ -1,11 +1,9 @@
 import { SpecEvent } from '@spec.types/spec'
 export { SpecEvent, SpecEventOrigin } from '@spec.types/spec'
-
+import { AGClientSocket } from 'socketcluster-client'
 export type StringKeyMap = { [key: string]: any }
 
-export type SpecEventClientOptions = {
-    hostname?: string
-    port?: number
+export type SpecEventClientOptions = AGClientSocket.ClientOptions & {
     oneSubPerChannel?: boolean
     signedAuthToken?: string | null
     onConnect?: () => void
