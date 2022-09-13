@@ -83,6 +83,9 @@ export default class SpecEventClient {
                 logger.info('Socket connected.')
                 this.onConnect && this.onConnect()
             }
+            for await (let { error } of socket.listener('error')) {
+                logger.error(`Socket error ${error}`)
+            }
         })()
 
         return socket
