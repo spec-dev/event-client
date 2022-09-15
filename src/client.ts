@@ -1,8 +1,9 @@
 import config from './lib/config'
-import { SpecEventClientOptions, EventCallback } from './lib/types'
+import { SpecEventClientOptions, EventCallback, StringKeyMap } from './lib/types'
 import { create as createSocket, AGClientSocket } from 'socketcluster-client'
 import logger from './lib/logger'
 import { AGAuthEngine, AuthToken, SignedAuthToken } from 'socketcluster-client/lib/auth'
+import chalk from 'chalk'
 
 const DEFAULT_OPTIONS = {
     hostname: config.HOSTNAME,
@@ -52,7 +53,7 @@ export default class SpecEventClient {
         this.socket = this._initSocket()
     }
 
-    on(channelName: string, cb: EventCallback) {
+    on(channelName: string, cb: EventCallback, opts?: StringKeyMap) {
         if (this.oneSubPerChannel && this.channelSubs.has(channelName)) {
             logger.warn(`Already subscribed to channel ${channelName}.`)
             return
@@ -60,7 +61,7 @@ export default class SpecEventClient {
 
         ;(async () => {
             const channel = this.socket.subscribe(channelName)
-            logger.info(`Subscribed to channel ${channelName}.`)
+            opts?.temp || logger.info(chalk.green(`Subscribed to channel ${channelName}.`))
 
             for await (const data of channel) {
                 cb(data)
