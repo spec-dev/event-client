@@ -76,12 +76,15 @@ export default class SpecEventClient {
         this.channelSubs.delete(channelName)
     }
 
+    isConnected(): boolean {
+        return this.socket?.state === 'open'
+    }
+
     _initSocket(): AGClientSocket {
         const socket = createSocket(this.options)
 
         ;(async () => {
             for await (let _ of socket.listener('connect')) {
-                logger.info('Socket connected.')
                 this.onConnect && this.onConnect()
             }
             for await (let { error } of socket.listener('error')) {
