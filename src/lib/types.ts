@@ -12,7 +12,7 @@ export type SpecEventClientOptions = AGClientSocket.ClientOptions & {
 export type EventCallback = (event: SpecEvent) => void
 
 export {
-    SpecEvent, 
+    SpecEvent,
     SpecEventOrigin,
     Timestamp,
     ChainId,
