@@ -61,8 +61,6 @@ export default class SpecEventClient {
 
         ;(async () => {
             const channel = this.socket.subscribe(channelName)
-            opts?.temp || logger.info(chalk.green(`Subscribed to channel ${channelName}.`))
-
             for await (const data of channel) {
                 cb(data)
             }
