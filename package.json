@@ -1,6 +1,6 @@
 {
     "name": "@spec.dev/event-client",
-    "version": "0.0.11",
+    "version": "0.0.12",
     "description": "Spec Event Client",
     "keywords": [
         "javascript",
@@ -33,7 +33,6 @@
     },
     "dependencies": {
         "@spec.types/spec": "^0.0.16",
-        "chalk": "4.1.0",
         "socketcluster-client": "^16.1.1"
     },
     "devDependencies": {

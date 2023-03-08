@@ -3,7 +3,6 @@ import { SpecEventClientOptions, EventCallback, StringKeyMap } from './lib/types
 import { create as createSocket, AGClientSocket } from 'socketcluster-client'
 import logger from './lib/logger'
 import { AGAuthEngine, AuthToken, SignedAuthToken } from 'socketcluster-client/lib/auth'
-import chalk from 'chalk'
 
 const DEFAULT_OPTIONS = {
     hostname: config.HOSTNAME,
@@ -54,6 +53,8 @@ export default class SpecEventClient {
     }
 
     on(channelName: string, cb: EventCallback, opts?: StringKeyMap) {
+        channelName = this._resolveChannelName(channelName)
+
         if (this.oneSubPerChannel && this.channelSubs.has(channelName)) {
             logger.warn(`Already subscribed to channel ${channelName}.`)
             return
@@ -70,6 +71,7 @@ export default class SpecEventClient {
     }
 
     async off(channelName: string) {
+        channelName = this._resolveChannelName(channelName)
         await this.socket.unsubscribe(channelName)
         this.channelSubs.delete(channelName)
     }
@@ -103,5 +105,9 @@ export default class SpecEventClient {
             removeToken: async (name: string) => null,
             loadToken: async (name: string) => this.signedAuthToken,
         }
+    }
+
+    _resolveChannelName(channelName: string): string {
+        return channelName.includes('@') ? channelName : `${channelName}@0.0.1`
     }
 }
