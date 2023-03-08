@@ -1,6 +1,7 @@
 # Spec Event Client
 
-Isomorphic JavaScript client to Spec's event network. Easily subscribe to any contract event or custom Spec event published on Spec.
+JavaScript client for the Spec event network. 
+Easily subscribe to any contract event or custom Spec event published on Spec.
 
 ## Installation
 
@@ -10,7 +11,7 @@ $ npm install @spec.dev/event-client
 
 ## Quickstart
 
-Subscribe to any Spec event by name:
+Subscribe to any event on Spec by name:
 
 ```typescript
 import { createEventClient, SpecEvent } from '@spec.dev/event-client'
