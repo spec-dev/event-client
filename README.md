@@ -24,12 +24,12 @@ const spec = createEventClient({
 
 // Listen for all new ethereum blocks.
 spec.on('eth.NewBlock', (event: SpecEvent) => {
-    console.log(event.data)
+    console.log(event)
 })
 
 // Listen for PostCreated contract events on Lens.
 spec.on('polygon.contracts.lens.LensHubProxy.PostCreated', (event: SpecEvent) => {
-    console.log(event.data)
+    console.log(event)
 })
 ```
 
@@ -38,7 +38,7 @@ spec.on('polygon.contracts.lens.LensHubProxy.PostCreated', (event: SpecEvent) =>
 All events on Spec share the following interface:
 
 ```typescript
-interface SpecEvent = {
+interface SpecEvent {
     id: string
     nonce: string
     name: string
