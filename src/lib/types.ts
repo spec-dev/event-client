@@ -1,5 +1,5 @@
 import { AGClientSocket } from 'socketcluster-client'
-import { SpecEvent } from '@spec.types/spec'
+import { SpecEvent, SpecCall } from '@spec.types/spec'
 
 export type StringKeyMap = { [key: string]: any }
 
@@ -11,9 +11,13 @@ export type SpecEventClientOptions = AGClientSocket.ClientOptions & {
 
 export type EventCallback = (event: SpecEvent) => void
 
+export type CallCallback = (call: SpecCall) => void
+
 export {
     SpecEvent,
     SpecEventOrigin,
+    SpecCall,
+    SpecCallOrigin,
     Timestamp,
     ChainId,
     BlockNumber,

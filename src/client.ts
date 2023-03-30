@@ -1,5 +1,5 @@
 import config from './lib/config'
-import { SpecEventClientOptions, EventCallback, StringKeyMap } from './lib/types'
+import { SpecEventClientOptions, EventCallback, StringKeyMap, CallCallback } from './lib/types'
 import { create as createSocket, AGClientSocket } from 'socketcluster-client'
 import logger from './lib/logger'
 import { AGAuthEngine, AuthToken, SignedAuthToken } from 'socketcluster-client/lib/auth'
@@ -52,8 +52,9 @@ export default class SpecEventClient {
         this.socket = this._initSocket()
     }
 
-    on(channelName: string, cb: EventCallback, opts?: StringKeyMap) {
-        channelName = this._resolveChannelName(channelName)
+    on(channelName: string, cb: EventCallback | CallCallback, opts?: StringKeyMap) {
+        const dontResolveVersion = opts?.resolveVersion === false
+        channelName = dontResolveVersion ? channelName : this._resolveChannelName(channelName)
 
         if (this.oneSubPerChannel && this.channelSubs.has(channelName)) {
             logger.warn(`Already subscribed to channel ${channelName}.`)
@@ -68,6 +69,14 @@ export default class SpecEventClient {
         })()
 
         this.channelSubs.add(channelName)
+    }
+
+    onEvent(channelName: string, cb: EventCallback, opts?: StringKeyMap) {
+        this.on(channelName, cb, opts)
+    }
+
+    onCall(channelName: string, cb: CallCallback) {
+        this.on(channelName, cb, { resolveVersion: false })
     }
 
     async off(channelName: string) {
