@@ -9,7 +9,7 @@
         "rootDir": "src",
         "sourceMap": true,
         "target": "ES2015",
-        "strict": true,
+        "strict": false,
         "esModuleInterop": true,
         "moduleResolution": "Node",
         "forceConsistentCasingInFileNames": true,
