@@ -53,8 +53,8 @@ export default class SpecEventClient {
     }
 
     on(channelName: string, cb: EventCallback | CallCallback, opts?: StringKeyMap) {
-        const dontResolveVersion = opts?.resolveVersion === false
-        channelName = dontResolveVersion ? channelName : this._resolveChannelName(channelName)
+        const resolveVersion = opts?.resolveVersion !== false
+        channelName = resolveVersion ? this._resolveChannelName(channelName) : channelName
 
         if (this.oneSubPerChannel && this.channelSubs.has(channelName)) {
             logger.warn(`Already subscribed to channel ${channelName}.`)
@@ -79,8 +79,9 @@ export default class SpecEventClient {
         this.on(channelName, cb, { resolveVersion: false })
     }
 
-    async off(channelName: string) {
-        channelName = this._resolveChannelName(channelName)
+    async off(channelName: string, opts?: StringKeyMap) {
+        const resolveVersion = opts?.resolveVersion !== false
+        channelName = resolveVersion ? this._resolveChannelName(channelName) : channelName
         await this.socket.unsubscribe(channelName)
         this.channelSubs.delete(channelName)
     }
